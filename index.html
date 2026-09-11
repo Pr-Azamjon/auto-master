@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автомастерская "АвтоМастер"</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1e272e; margin: 0; padding: 15px; color: #fff; }
+        .header { text-align: center; padding: 15px; background: #2f3640; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-bottom: 4px solid #e1b12c; }
+        .header h2 { margin: 0; color: #e1b12c; }
+        .card { background: #2f3640; padding: 15px; margin-top: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #e1b12c; }
+        .box-info h3 { margin: 0 0 5px 0; color: #f5f6fa; }
+        .box-info p { margin: 0; color: #dcdde1; font-size: 14px; }
+        .status { font-weight: bold; color: #4cd137; margin-top: 5px; font-size: 13px; transition: color 0.3s ease; }
+        .status.busy { color: #ea2027; } /* Стиль для занятого бокса */
+        .btn { background: #e1b12c; color: #1e272e; border: none; padding: 10px 18px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: #f5cd79; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>🛠️ Автосервис "АвтоМастер"</h2>
+        <p>Запись в боксы ремонта прямо через Telegram</p>
+    </div>
+
+    <!-- Бокс 1 -->
+    <div class="card">
+        <div class="box-info">
+            <h3>🚗 Бокс 1: Моторист</h3>
+            <p>Ремонт ДВС, замена ГРМ, диагностика</p>
+            <div class="status" id="status-box1">🟢 Свободно</div>
+        </div>
+        <button class="btn" onclick="openOrderForm('Бокс 1: Моторист', 'status-box1')"> Запись </button>
+    </div>
+
+    <!-- Бокс 2 -->
+    <div class="card">
+        <div class="box-info">
+            <h3>🔧 Бокс 2: Ходовойщик</h3>
+            <p>Ремонт подвески, тормозов, амортизаторов</p>
+            <div class="status" id="status-box2">🟢 Свободно</div>
+        </div>
+        <button class="btn" onclick="openOrderForm('Бокс 2: Ходовойщик', 'status-box2')"> Запись </button>
+    </div>
+
+    <!-- Бокс 3 -->
+    <div class="card">
+        <div class="box-info">
+            <h3>⚡ Бокс 3: Электрик</h3>
+            <p>Компьютерная диагностика, проводка, свет</p>
+            <div class="status" id="status-box3">🟢 Свободно</div>
+        </div>
+        <button class="btn" onclick="openOrderForm('Бокс 3: Электрик', 'status-box3')"> Запись </button>
+    </div>
+
+    <!-- Бокс 4 -->
+    <div class="card">
+        <div class="box-info">
+            <h3>🛢️ Бокс 4: Замена масла</h3>
+            <p>Замена масла в ДВС, КПП, фильтры</p>
+            <div class="status" id="status-box4">🟢 Свободно</div>
+        </div>
+        <button class="btn" onclick="openOrderForm('Бокс 4: Замена масла', 'status-box4')"> Запись </button>
+    </div>
+
+    <!-- Бокс 5 -->
+    <div class="card">
+        <div class="box-info">
+            <h3>🛞 Бокс 5: Шиномонтаж</h3>
+            <p>Балансировка, ремонт проколов, переобувка</p>
+            <div class="status" id="status-box5">🟢 Свободно</div>
+        </div>
+        <button class="btn" onclick="openOrderForm('Бокс 5: Шиномонтаж', 'status-box5')"> Запись </button>
+    </div>
+
+    <!-- Всплывающее окно записи -->
+    <div id="order-form" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#2f3640; padding:20px; border-radius:10px; z-index:999; box-shadow:0 5px 25px rgba(0,0,0,0.5); width: 80%; max-width: 350px; border: 2px solid #e1b12c;">
+        <h3 style="color:#e1b12c; margin-top:0;">📋 Онлайн-запись</h3>
+
+        <label style="font-size:12px; color:#aaa;">Выбранный бокс:</label>
+        <input type="text" id="box-name" readonly style="width:100%; margin-bottom:15px; padding:10px; background:#1e272e; color:#fff; border:1px solid #4a5464; border-radius:5px; box-sizing: border-box;">
+
+        <!-- Скрытое поле для отслеживания ID элемента статуса -->
+        <input type="hidden" id="current-status-id">
+
+        <label style="font-size:12px; color:#aaa;">Выберите дату и время осмотра:</label>
+        <input type="datetime-local" id="appointment-date" required style="width:100%; margin-bottom:15px; padding:10px; background:#1e272e; color:#fff; border:1px solid #4a5464; border-radius:5px; box-sizing: border-box;">
+
+        <label style="font-size:12px; color:#aaa;">Ваш номер телефона:</label>
+        <input type="tel" id="phone" placeholder="+992" required style="width:100%; margin-bottom:15px; padding:10px; background:#1e272e; color:#fff; border:1px solid #4a5464; border-radius:5px; box-sizing: border-box;">
+
+        <button onclick="sendOrder()" style="width:100%; padding:12px; background:#4cd137; color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Подтвердить запись</button>
+        <button onclick="document.getElementById('order-form').style.display='none'" style="margin-top:10px; width:100%; padding:10px; background:transparent; color:#ea2027; border:1px solid #ea2027; border-radius:5px; cursor:pointer;">Отмена</button>
+    </div>
+
+<script src="https://telegram.org"></script>
+<script>
+// Безопасная инициализация Telegram WebApp
+const tg = window.Telegram?.WebApp;
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+function openOrderForm(boxName, statusElementId) {
+    document.getElementById('box-name').value = boxName;
+    document.getElementById('current-status-id').value = statusElementId;
+    document.getElementById('order-form').style.display = 'block';
+}
+
+function sendOrder() {
+    const box = document.getElementById('box-name').value;
+    const phone = document.getElementById('phone').value;
+    const appointmentDate = document.getElementById('appointment-date').value;
+    const statusId = document.getElementById('current-status-id').value;
+
+    if (!appointmentDate) {
+        alert("Пожалуйста, выберите дату и время!");
+        return;
+    }
+    if (!phone) {
+        alert("Введи номер телефона для связи!");
+        return;
+    }
+
+    // Безопасное получение данных: если открыто в браузере, подставятся стандартные значения
+    let userId = 0;
+    let username = "Локальный пользователь";
+
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+        username = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name;
+    }
+
+    // Форматируем дату для красивого отображения статуса
+    const formattedDate = new Date(appointmentDate).toLocaleString('ru-RU', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    // Отправка данных на FastAPI бэкенд
+    fetch('/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            product: box,
+            phone: phone,
+            user_id: userId,
+            username: username,
+            appointment_date: appointmentDate
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("✅ Вы успешно записаны! Мастер ждет вас.");
+        document.getElementById('order-form').style.display = 'none';
+
+        // Меняем статус бокса на странице
+        const statusElement = document.getElementById(statusId);
+        if (statusElement) {
+            statusElement.innerText = `🔴 Занят (Запись на ${formattedDate})`;
+            statusElement.classList.add('busy');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Ошибка отправки заказа. Проверьте, запущен ли FastAPI сервер.");
+    });
+}
+</script>
+</body>
+</html>
+
